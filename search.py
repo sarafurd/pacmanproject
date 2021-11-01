@@ -145,8 +145,50 @@ def nullHeuristic(state, problem=None):
     return 0
 
 def aStarSearch(problem, heuristic=nullHeuristic):
-    """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
+# This is the starting state of Pacman
+    startingNode = problem.getStartState()
+
+    # Check if we are already on a food pellet
+    if problem.isGoalState(startingNode):
+        return []
+
+    # Use a Priority queue for FIFO
+    queue = util.PriorityQueue()
+
+    # Use a list to store visited nodes
+    explored = []
+
+    # Add starting node and command for Pacman to follow into queue
+    #We now need to pass the current cost from start g(n) and the priority number
+    queue.push((startingNode, [], 0), 0)
+
+    # While the board is not empty
+    while not queue.isEmpty():
+
+        # The node and action that is popped from the queue will be assigned 
+        # to the variables currentNode and actions, respectively
+        currentNode, actions, currentCost = queue.pop()
+
+        # If the current node is not already visited, 
+        # append the current node to the list of visited nodes
+        if currentNode not in explored:
+            explored.append(currentNode)
+
+            # If we are at a food pellet, return the actions taken to get to it
+            if problem.isGoalState(currentNode):
+                return actions
+
+            # If the current node is not the goal, 
+            # check the next node and push the next node and action to get to it into the queue
+            # we can now use the cost
+            for nextNode, action, cost in problem.getSuccessors(currentNode):
+                newAction = actions + [action]
+                #g(n) is cumulative
+                updatedCost = currentCost + cost
+                #get priority based on heurstic h(n)
+                #heursitc = node + 5
+                priority = updatedCost + heuristic(nextNode, problem)
+                queue.push((nextNode, newAction, updatedCost), priority)
     util.raiseNotDefined()
 
 
