@@ -269,7 +269,6 @@ def euclideanHeuristic(position, problem, info={}):
 class CornersProblem(search.SearchProblem):
     """
     This search problem finds paths through all four corners of a layout.
-
     You must select a suitable state space and successor function
     """
 
@@ -295,19 +294,22 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        ret = (self.startingPosition, False, False, False, False) 
+        return ret
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        for t in state[1:]:
+            if t is False:
+                return False
+        return True
 
     def getSuccessors(self, state):
         """
         Returns successor states, the actions they require, and a cost of 1.
-
          As noted in search.py:
             For a given state, this should return a list of triples, (successor,
             action, stepCost), where 'successor' is a successor to the current
@@ -325,7 +327,19 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
-
+            x, y = state[0]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty] 
+            if hitsWall is False:
+                boolean = []
+                for i in range(len(self.corners)):
+                    value = ((nextx, nexty)==self.corners[i]) or\
+                               state[i+1]
+                    boolean.append(value)
+                state_next = ((nextx, nexty), boolean[0], boolean[1],\
+                              boolean[2], boolean[3])
+                successors.append((state_next, action, 1))
         self._expanded += 1 # DO NOT CHANGE
         return successors
 
@@ -346,12 +360,9 @@ class CornersProblem(search.SearchProblem):
 def cornersHeuristic(state, problem):
     """
     A heuristic for the CornersProblem that you defined.
-
       state:   The current search state
                (a data structure you chose in your search problem)
-
       problem: The CornersProblem instance for this layout.
-
     This function should always return a number that is a lower bound on the
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
@@ -360,7 +371,13 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    heuristic_value = 0
+    for i in range(len(corners)):
+        if state[i+1] is False:
+            heuristic_value = max(heuristic_value,\
+            abs(state[0][0]-corners[i][0])+abs(state[0][1]-corners[i][1]))
+
+    return heuristic_value # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
