@@ -92,6 +92,44 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+    
+    # This is the starting state of Pacman
+    startingNode = problem.getStartState()
+
+    # Check if we are already on a food pellet
+    if problem.isGoalState(startingNode):
+        return []
+
+    # Use a queue for FIFO
+    queue = util.Queue()
+
+    # Use a list to store visited nodes
+    explored = []
+
+    # Add starting node and command for Pacman to follow into queue
+    queue.push((startingNode, []))
+
+    # While the board is not empty
+    while not queue.isEmpty():
+
+        # The node and action that is popped from the queue will be assigned 
+        # to the variables currentNode and actions, respectively
+        currentNode, actions = queue.pop()
+
+        # If the current node is not already visited, 
+        # append the current node to the list of visited nodes
+        if currentNode not in explored:
+            explored.append(currentNode)
+
+            # If we are at a food pellet, return the actions taken to get to it
+            if problem.isGoalState(currentNode):
+                return actions
+
+            # If the current node is not the goal, 
+            # check the next node and push the next node and action to get to it into the queue
+            for nextNode, action, cost in problem.getSuccessors(currentNode):
+                newAction = actions + [action]
+                queue.push((nextNode, newAction))
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
